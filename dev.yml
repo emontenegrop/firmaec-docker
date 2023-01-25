@@ -1,0 +1,50 @@
+version: '3.5'
+services:
+     api_firmadigital: &api
+          build:
+               context: .
+               dockerfile: ./compose/dev/Dockerfile
+          image: firmaec
+          container_name: firmaec_api  
+          ports:
+               - "8080:8080"
+               - "9990:9990"
+               - "8787:8787"
+          volumes:
+               - ./api/wildfly-26.1.3:/opt/wildfly
+               - ./api/scripts:/opt/scripts
+          networks:
+               - proxynet
+
+     servicio_firmadigital: &servicio
+          build:
+               context: .
+               dockerfile: ./compose/dev/Dockerfile
+          image: firmaec
+          container_name: firmaec_sevicio
+          ports:
+               - "8081:8080"
+               - "9991:9990"
+               - "8788:8787"
+          volumes:
+               - ./servicio/wildfly-26.1.3:/opt/wildfly
+               - ./servicio/scripts:/opt/scripts
+          networks:
+               - proxynet
+     db: &db
+          image: 'postgres:15-alpine'          
+          volumes:
+               - './postgres_data:/var/lib/postgresql/data'
+          container_name: firmaec_db
+          environment:
+               - POSTGRES_USER=firmadigital
+               - POSTGRES_PASSWORD=CT-QzugsLYk2RyXP
+               - POSTGRES_DATABASE=firmadigital
+          ports:
+               - '5432:5432' 
+          networks:
+               - proxynet
+      
+networks:
+  proxynet:
+    name: certificaciones_customnetwork
